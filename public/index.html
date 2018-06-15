@@ -1,0 +1,159 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="Ankush Kawanpure" content="">
+
+
+    <title>Shrink URL</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: -ms-flexbox;
+            display: -webkit-box;
+            display: block;
+            -ms-flex-align: center;
+            -ms-flex-pack: center;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            width: 100%;
+            padding: 50px;
+        }
+
+        .formCointainer{
+            width: 100%;
+        }
+
+        .form-submitlong {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+        .form-submitlong .form-control {
+            position: relative;
+            box-sizing: border-box;
+            height: auto;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .form-submitlong .form-control:focus {
+            z-index: 2;
+        }
+        .form-submitlong input[type="url"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .res {
+            width: 100%;
+            padding: 50px;
+        }
+    </style>
+
+</head>
+
+<body class="text-center">
+<div class="header">
+    <h1>Shrink Your URL</h1>
+</div>
+
+<div class="formCointainer">
+    <form class="form-submitlong" onsubmit=proceessDetails(event) >
+
+        <h1 class="h3 mb-3 font-weight-normal">Your URL</h1>
+        <label for="inputURL" class="sr-only">URL</label>
+        <input type="url" id="inputURL" class="form-control" placeholder="Paste a url to shortne it" required autofocus>
+        <button id="submitButton" class="btn btn-lg btn-primary btn-block" type="submit" >Shrink</button>
+    </form>
+</div>
+<div class="res">
+    <div id="responsespace" class="alert alert-success" style="visibility: hidden" role="alert">
+
+    </div>
+</div>
+
+<script>
+
+    function makeAjaxCall(url, methodType, longURL){
+        // console.log("in ajax call");
+        var promiseObj = new Promise(function(resolve, reject){
+
+            var data = {
+                longURL : longURL
+            };
+
+            var xhr = new XMLHttpRequest();
+            xhr.open(methodType, url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+
+            xhr.send(JSON.stringify(data));
+
+            xhr.onreadystatechange = function(){
+                if (xhr.readyState === 4){
+                    if (xhr.status === 200){
+                        // console.log("xhr done successfully");
+                        var resp = xhr.responseText;
+                        var respJson = JSON.parse(resp);
+                        resolve(respJson);
+                    } else {
+                        reject(xhr.status);
+                        console.log("xhr failed");
+                    }
+                } else {
+                    // console.log("xhr processing going on");
+                }
+            };
+            // console.log("request sent succesfully");
+        });
+
+        return promiseObj;
+    }
+
+    // document.getElementById("submitButton").addEventListener("click", function(){
+    //     var longURL = document.getElementById("inputURL").value;
+    //     var URL = "/shrink";
+    //     makeAjaxCall(URL, "POST", longURL).then(processUserDetailsResponse, errorHandler);
+    // });
+
+    function proceessDetails(e) {
+        e.preventDefault();
+        var longURL = document.getElementById("inputURL").value;
+        var URL = "/shrink";
+        makeAjaxCall(URL, "POST", longURL).then(processUserDetailsResponse, errorHandler);
+    }
+
+    function processUserDetailsResponse(userData){
+        var divele = document.getElementById("responsespace");
+        divele.style.visibility = "visible";
+        divele.innerHTML = "Your Short URL: " + userData.shortURL;
+    }
+
+
+    function errorHandler(statusCode){
+        console.log("failed with status", status);
+    }
+
+</script>
+</body>
+</html>
+
+
